@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ROYAL KIDS PUZZLE</title>
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;padding:18px;text-align:center;
+ font-family:Arial,sans-serif;color:white;
+ background:linear-gradient(140deg,#16002b,#572078,#16002b);
+}
+h1{color:#ffd700;text-shadow:0 0 12px orange}
+h2{color:#ffe082}
+.card{
+ background:#ffffff18;border:2px solid #ffd700;
+ border-radius:20px;padding:18px;margin:15px auto;
+ max-width:420px;
+}
+button{
+ background:linear-gradient(45deg,#ff9800,#ffd700);
+ color:#35104b;border:0;border-radius:15px;
+ padding:14px 22px;margin:8px;
+ font-size:18px;font-weight:bold;
+}
+button:active{transform:scale(.95)}
+#puzzle{
+ display:grid;grid-template-columns:repeat(3,1fr);
+ gap:5px;max-width:330px;margin:20px auto;
+}
+.tile{
+ aspect-ratio:1;background:#fff;color:#222;
+ display:flex;align-items:center;justify-content:center;
+ font-size:42px;border-radius:10px;
+}
+#message{color:#7CFF8B;font-size:22px;font-weight:bold}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<h1>👑 ROYAL KIDS PUZZLE 👑</h1>
+<h2>Welcome Kids!</h2>
+<p>Let's Play and Learn!</p>
+
+<div id="home" class="card">
+<h2>🎮 Choose Your Puzzle</h2>
+<button onclick="start('animal')">🐘 Animal Puzzle</button>
+<button onclick="start('bus')">🚌 Bus Puzzle</button>
+<button onclick="start('vehicle')">🚗 Vehicle Puzzle</button>
+</div>
+
+<div id="game" class="card hidden">
+<h2 id="gameTitle"></h2>
+<p>சரியான வரிசையில் எண்களை அமைக்கவும்!</p>
+<div id="puzzle"></div>
+<p id="message"></p>
+<button onclick="shuffle()">🔄 Restart</button>
+<button onclick="goHome()">🏠 Home</button>
+</div>
+
+<script>
+const pictures={
+ animal:["🐘","🦁","🐯","🐵","🐼","🐸","🐰","🦒","🐻"],
+ bus:["🚌","🚍","🚎","🚐","🚕","🚗","🚙","🚓","🚑"],
+ vehicle:["🚗","🚕","🚙","🏎️","🚓","🚑","🚒","🚜","🚚"]
+};
+
+let current="animal";
+let tiles=[];
+
+function start(type){
+ current=type;
+ document.getElementById("home").classList.add("hidden");
+ document.getElementById("game").classList.remove("hidden");
+ document.getElementById("gameTitle").innerText=
+ type==="animal"?"🐘 Animal Puzzle":
+ type==="bus"?"🚌 Bus Puzzle":"🚗 Vehicle Puzzle";
+ shuffle();
+}
+
+function shuffle(){
+ tiles=[1,2,3,4,5,6,7,8,0];
+ for(let i=tiles.length-1;i>0;i--){
+ let j=Math.floor(Math.random()*(i+1));
+ [tiles[i],tiles[j]]=[tiles[j],tiles[i]];
+ }
+ if(isSolved()) shuffle();
+ draw();
+ document.getElementById("message").innerText="";
+}
+
+function isSolved(){
+ return tiles.every((v,i)=>v===(i+1)%9);
+}
+
+function draw(){
+ const board=document.getElementById("puzzle");
+ board.innerHTML="";
+ tiles.forEach((n,i)=>{
+ let div=document.createElement("div");
+ div.className="tile";
+ if(n===0){
+ div.style.background="#ffd700";
+ div.innerText="⭐";
+ }else{
+ div.innerText=pictures[current][n-1];
+ }
+ div.onclick=()=>move(i);
+ board.appendChild(div);
+ });
+}
+
+function move(i){
+ let empty=tiles.indexOf(0);
+ let adjacent=
+ Math.abs(i-empty)===3 ||
+ (Math.floor(i/3)===Math.floor(empty/3)&&Math.abs(i-empty)===1);
+ if(adjacent){
+ [tiles[i],tiles[empty]]=[tiles[empty],tiles[i]];
+ draw();
+ if(isSolved()){
+ document.getElementById("message").innerText="🎉 SUPER! YOU WON! 🏆";
+ }
+ }
+}
+
+function goHome(){
+ document.getElementById("game").classList.add("hidden");
+ document.getElementById("home").classList.remove("hidden");
+}
+</script>
+
+</body>
+</html>
